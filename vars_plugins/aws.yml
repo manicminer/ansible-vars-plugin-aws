@@ -17,9 +17,6 @@ cache_env_vars:
   - AWS_PROFILE
   - AWS_STS_PROFILE
 
-# Common prefix for all resource names
-resource_prefix: acme
-
 # AWS profile matching
 # When a list, use for looking up resource IDs
 # When a dict, also look inside each profile for tags to match to export credentials
