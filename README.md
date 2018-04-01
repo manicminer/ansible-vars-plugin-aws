@@ -222,6 +222,58 @@ aws_profiles:
     env: ops
 ```
 
+# Putting It All Together
+
+By passing the `env`, `project` and `service` extra vars to `ansible-playbook`, you can invoke the multi-account support to auto-select the correct AWS account to use, and use those same extra vars to pick the right resources. IN the example below, the instance will be launched in the desired account, with the appropriate security group and subnet for the service type.
+
+```
+$ ansible-playbook launch.yml -e env=stage -e project=manhattan -e service=app
+```
+```ansible
+- hosts: localhost
+  connection: local
+
+  vars:
+    region: us-east-1
+
+  tasks:
+
+    - name: Launch instance
+      ec2:
+        region: "{{ region }}"
+        instance_tags:
+          env: "{{ env }}"
+          project: "{{ project }}"
+          service: "{{ service }}"
+        instance_type: t2.micro
+        group_id: "{{ security_group_ids[region][project][env][service] }}"
+        vpc_subnet_id: "{{ subnet_ids[region][project][env][service] | random }}"
+        wait: yes
+      register: result_ec2
+
+    - name: Register in inventory
+      add_host:
+        name: "{{ item.private_ip }}"
+        groups: launch
+        ec2_id: "{{ item.id }}"
+      when: item.state == 'running'
+      with_flattened:
+        - "{{ result_ec2.results | map(attribute='instances') | list }}"
+
+    - name: Wait for SSH
+      wait_for:
+        host: "{{ item }}"
+        port: 22
+        timeout: 420
+        state: started
+      with_items: "{{ groups.launch }}"
+
+
+- hosts: launch
+  roles:
+    - role: common
+```
+
 
 # Regions
 
