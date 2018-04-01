@@ -229,7 +229,7 @@ By passing the `env`, `project` and `service` extra vars to `ansible-playbook`, 
 ```
 $ ansible-playbook launch.yml -e env=stage -e project=manhattan -e service=app
 ```
-```ansible
+```yaml
 - hosts: localhost
   connection: local
 
