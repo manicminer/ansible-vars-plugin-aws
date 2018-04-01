@@ -88,24 +88,24 @@ subnet-aabbcc14 | apollo       | prod     | data
 subnet-aabbcc15 | apollo       | prod     | data
 subnet-aabbcc16 | apollo       | prod     | lb
 subnet-aabbcc17 | apollo       | prod     | lb
-subnet-aabbcc18 | apollo       | stage    | app
-subnet-aabbcc19 | apollo       | stage    | app
-subnet-aabbcc20 | apollo       | stage    | data
-subnet-aabbcc21 | apollo       | stage    | data
-subnet-aabbcc22 | apollo       | stage    | lb
-subnet-aabbcc23 | apollo       | stage    | lb
+subnet-aabbcc18 | apollo       | staging  | app
+subnet-aabbcc19 | apollo       | staging  | app
+subnet-aabbcc20 | apollo       | staging  | data
+subnet-aabbcc21 | apollo       | staging  | data
+subnet-aabbcc22 | apollo       | staging  | lb
+subnet-aabbcc23 | apollo       | staging  | lb
 subnet-aabbcc24 | manhattan    | prod     | app
 subnet-aabbcc25 | manhattan    | prod     | app
 subnet-aabbcc26 | manhattan    | prod     | data
 subnet-aabbcc27 | manhattan    | prod     | data
 subnet-aabbcc28 | manhattan    | prod     | lb
 subnet-aabbcc29 | manhattan    | prod     | lb
-subnet-aabbcc30 | manhattan    | stage    | app
-subnet-aabbcc31 | manhattan    | stage    | app
-subnet-aabbcc32 | manhattan    | stage    | data
-subnet-aabbcc33 | manhattan    | stage    | data
-subnet-aabbcc34 | manhattan    | stage    | lb
-subnet-aabbcc35 | manhattan    | stage    | lb
+subnet-aabbcc30 | manhattan    | staging  | app
+subnet-aabbcc31 | manhattan    | staging  | app
+subnet-aabbcc32 | manhattan    | staging  | data
+subnet-aabbcc33 | manhattan    | staging  | data
+subnet-aabbcc34 | manhattan    | staging  | lb
+subnet-aabbcc35 | manhattan    | staging  | lb
 
 You'll end up with a global dictionary like:
 
@@ -123,7 +123,7 @@ subnet_ids:
         lb:
           - subnet-aabbcc16
           - subnet-aabbcc17
-      stage:
+      staging
         app:
           - subnet-aabbcc18
           - subnet-aabbcc19
@@ -144,7 +144,7 @@ subnet_ids:
         lb:
           - subnet-aabbcc28
           - subnet-aabbcc29
-      stage:
+      staging
         app:
           - subnet-aabbcc30
           - subnet-aabbcc31
@@ -164,7 +164,7 @@ Which you can reference like this:
   tasks:
     - ec2:
         instance_type: t2.micro
-        vpc_subnet_id: "{{ subnet_ids['us-east-1']['manhattan']['stage']['app'] | random }}"
+        vpc_subnet_id: "{{ subnet_ids['us-east-1']['manhattan']['staging']['app'] | random }}"
         state: present
 ```
 
@@ -226,10 +226,10 @@ The primary limitation of this approach is that the AWS account is selected once
 
 # Putting It All Together
 
-By passing the `env`, `project` and `service` extra vars to `ansible-playbook`, you can invoke the multi-account support to auto-select the correct AWS account to use, and use those same extra vars to pick the right resources. IN the example below, the instance will be launched in the desired account, with the appropriate security group and subnet for the service type.
+By passing the `env`, `project` and `service` extra vars to `ansible-playbook`, you can invoke the multi-account support to auto-select the correct AWS account to use, and use those same extra vars to pick the right resources. In the example below, the instance will be launched in the desired account, with the appropriate security group and subnet for the service type.
 
 ```
-$ ansible-playbook launch.yml -e env=stage -e project=manhattan -e service=app
+$ ansible-playbook launch.yml -e env=staging -e project=manhattan -e service=app
 ```
 ```yaml
 - hosts: localhost
@@ -286,5 +286,5 @@ For maximum control, this plugin requires that regions be explicitly configured.
 
 Just like Ansible's EC2 inventory script, this plugin caches all the resource information it finds, in order to speed up subsequent playbook executions. The cache can be disabled by setting `use_cache: no` in the configuration file, and the cache timeout (which defaults to 10 minutes) can be specified [in seconds] with the `cache_max_age` setting.
 
-It's possible that factors outside of Ansible could invalidate cached information, so it's also possible to configure one or more environment variables, the values of which will be saved and if they change between playbok runs, the cache will be automatically invalidated.
+It's possible that factors outside of Ansible could invalidate cached information, so it's also possible to configure one or more environment variables, the values of which will be saved and if they change between playbook runs, the cache will be automatically invalidated.
 
