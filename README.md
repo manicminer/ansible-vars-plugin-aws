@@ -150,6 +150,49 @@ The multi account support provided by this plugin comes in two flavors.
 
 The primary limitation of this approach is that the AWS account is selected once, prior to playbook execution. However, it's possible to trivially use a different account for a given task by requesting credentials with the `sts_assume_role` module and specifying them explicitly for a task, which overrides the environment variables set by this plugin.
 
+For example, given this configuration:
+
+```yaml
+aws_profiles:
+  staging:
+    env:
+      - development
+      - staging
+  production:
+    env: production
+```
+
+And the following playbook invocation:
+
+```
+$ ansible-playbook do-a-thing.yml -e env=staging
+```
+
+The plugin would select the `staging` profile, obtain temporary credentials using that profile, then export those credentials to be automatically used by any AWS modules/tasks in your playbook.
+
+Any number of extra vars can be specified for each profile, and all must match for a profile to be selected. For example, you might have something like this, where each project resides in its own AWS account, and development happens in a default account (possibly the developers' own accounts):
+
+```yaml
+aws_profiles:
+  default:
+    env: development
+  apollo-staging:
+    env: staging
+    project: apollo
+  apollo-production:
+    env: production
+    project: apollo
+  manhattan-staging:
+    env: staging
+    project: manhattan
+  manhattan-production:
+    env: production
+    project: manhattan
+  ops:
+    env: ops
+```
+
+
 # Regions
 
 For maximum control, this plugin requires that regions be explicitly configured. The configuration setting `regions` is a list. All regions configured will be searched for resources, and the resulting dictionaries are nested by region.
