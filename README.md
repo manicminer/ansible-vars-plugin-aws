@@ -178,7 +178,7 @@ The multi account support provided by this plugin comes in two flavors.
 1. With multiple accounts configured as AWS profiles on your Ansible control host, the plugin will traverse all accounts to retrieve resource information.
 2. Additionally, with rules configured in the configuration file, it will inspect any extra vars you specify when running your playbook and *automatically select* one of the profiles to use for your playbook execution. This is accomplished by requesting temporary credentials from STS and exporting them within Ansible as a set of `AWS_*` environment variables. These exported env vars are consumed by Boto2 and Boto3-based modules alike.
 
-The primary limitation of this approach is that the AWS account is selected once, prior to playbook execution. However, it's possible to trivially use a different account for a given task by requesting credentials with the `sts_assume_role` module and specifying them explicitly for a task, which overrides the environment variables set by this plugin.
+Note that resources are still retrieved from all accounts, even when auto-selection is configured.
 
 For example, given this configuration:
 
@@ -221,6 +221,8 @@ aws_profiles:
   ops:
     env: ops
 ```
+
+The primary limitation of this approach is that the AWS account is selected once, prior to playbook execution. However, it's possible to trivially use a different account for a given task by requesting credentials with the `sts_assume_role` module and specifying them explicitly for a task, which overrides the environment variables set by this plugin.
 
 # Putting It All Together
 
