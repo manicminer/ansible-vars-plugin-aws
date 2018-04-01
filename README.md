@@ -156,6 +156,18 @@ subnet_ids:
           - subnet-aabbcc35
 ```
 
+Which you can reference like this:
+
+```yaml
+- hosts: localhost
+  connection: local
+  tasks:
+    - ec2:
+        instance_type: t2.micro
+        vpc_subnet_id: "{{ subnet_ids['us-east-1']['manhattan']['stage']['app'] | random }}"
+        state: present
+```
+
 The same pattern is implemented for VPCs, subnets, security groups and ELB target groups, alowing you to specify and target resources in your playbooks without hard coding resource IDs, without using `*_facts` modules everywhere, and without needing to know the exact names of every resource. It's important to note that these resources can reside in any number of AWS accounts, as long as they can be reached by your Ansible control host.
 
 
