@@ -126,7 +126,7 @@ class VarsModule(BaseVarsPlugin):
 
 
     def _profiles(self):
-        profiles = self.config.get('aws_profiles', [])
+        profiles = self.config.get('aws_profiles', ['default'])
         if isinstance(profiles, dict):
             return profiles.keys()
         else:
