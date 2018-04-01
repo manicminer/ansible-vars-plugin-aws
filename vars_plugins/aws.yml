@@ -1,0 +1,59 @@
+---
+
+# List of regions in which to look for VPCs, subnets and security groups
+regions:
+  - us-east-1
+
+# Whether or not to cache VPC, subnet, security group and LB tgarget group information
+use_cache: yes
+
+# Maximum time in seconds to cache VPC, subnet and security group information (default: 600)
+#cache_max_age: 600
+
+# Environment variables to use when saving cache. If any of these variables change, the cache is invalidated.
+# Useful when using multiple AWS configurations or profiles.
+cache_env_vars:
+  - AWS_CONFIG_FILE
+  - AWS_PROFILE
+  - AWS_STS_PROFILE
+
+# Common prefix for all resource names
+resource_prefix: acme
+
+# AWS profile matching
+# When a list, use for looking up resource IDs
+# When a dict, also look inside each profile for tags to match to export credentials
+aws_profiles:
+  staging:
+    env:
+      - development
+      - staging
+  production:
+    env: production
+  ops:
+    env: ops
+
+# Use tags to build a hierarchical dictionary of VPCs
+vpc_tags:
+  - project
+  - env
+
+# Use tags to build a hierarchical dictionary of subnets
+subnet_tags:
+  - project
+  - env
+  - tier
+
+# Use tags to build a hierarchical dictionary of security group IDs
+security_group_tags:
+  - project
+  - env
+  - service
+
+# Use tags to build a hierarchical dictionary of ELB target groups
+elb_target_group_tags:
+  - project
+  - env
+  - service
+
+# vim: set ts=2 sts=2 sw=2 et:

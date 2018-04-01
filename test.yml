@@ -1,0 +1,49 @@
+---
+
+- hosts: localhost
+  connection: local
+
+  tasks:
+
+    - debug:
+        var: aws_profile
+      tags: aws_profile
+
+    - debug:
+        var: aws_account_ids
+      tags: aws_account_ids
+
+    - debug:
+        var: vpcs
+      tags: vpcs
+
+    - debug:
+        var: vpc_ids
+      tags: vpc_ids
+
+    - debug:
+        var: subnets
+      tags: subnets
+
+    - debug:
+        var: subnet_ids
+      tags: subnet_ids
+
+    - debug:
+        var: security_groups
+      tags: security_groups
+
+    - debug:
+        var: security_group_ids
+      tags: security_group_ids
+
+    - debug:
+        var: elb_target_groups
+      tags: elb_target_groups
+
+    - debug:
+        var: elb_target_group_arns
+      tags: elb_target_group_arns
+
+
+# vim: set ft=ansible ts=2 sts=2 sw=2 et:
