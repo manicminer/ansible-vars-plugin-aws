@@ -13,7 +13,9 @@ Read below for more detailed explanations.
 
 # How To Use
 
-THis module is shipped with a skeleton structure with the intention that you can test it right out of this repository. However, it's more likely that you already have an Ansible project, in which case all you need to do it copy the `vars_plugins/` directory into your project root (relative to your playbooks). The plugin should be automatically detected by Ansible.
+This module is shipped with a skeleton structure with the intention that you can test it right out of this repository. An example AWS config file is given with `aws.ini` and wrapper scripts `ansible.sh`/`playbook.sh` to set some useful environment variables for you.
+
+However, it's more likely that you already have an Ansible project, in which case all you need to do it copy the `vars_plugins/` directory into your project root (relative to your playbooks). The plugin should be automatically detected by Ansible.
 
 If you have a different vars_plugin directory configured in `ansible.cfg`, just drop `aws.py` and `aws.yml` it into that directory instead.
 
