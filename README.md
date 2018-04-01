@@ -44,7 +44,23 @@ A list of tag keys to match when building a dictionary of subnet IDs. When speci
 A list of tag keys to match when building a dictionary of security group IDs. When specified, the global host variable `security_group_ids` contains a nested dictionary of resource IDs denominated by tag values. If not specified, no dictonary is set.
 
 `elb_target_group_tags:`  
-A list of tag keys to match when building a dictionary of ELB target groups IDs. When specified, the global host variable `elb_target_group_ids` contains a nested dictionary of resource IDs denominated by tag values. If not specified, no dictonary is set.
+A list of tag keys to match when building a dictionary of ELB target groups IDs. When specified, the global host variable `elb_target_group_arns` contains a nested dictionary of resource IDs denominated by tag values. If not specified, no dictonary is set.
+
+
+# Global Variables
+
+The following host variables are set by this plugin for every host Ansible attempts to manage, essentially these are global variables usable anywhere within your playbooks or roles.
+
+- `aws_account_ids` - a dictionary of AWS account IDs with profile name as keys and account ID as values.
+- `aws_profile` - the currently selected AWS profile when matched by extra vars
+- `elb_target_groups` - a dictionary of ELB target groups with resource ID as keys and dictionary of useful information as values
+- `elb_target_group_arns` - a complex nested dictionary of ELB target group ARNs denominated by matched tag values
+- `security_groups` - a dictionary of security groups with resource ID as keys and ductionary of useful information as values
+- `security_group_ids` - a complex nested dictionary of security group IDs denominated by matched tag values
+- `subnets` - a dictionary of subnets with resource ID as keys and ductionary of useful information as values
+- `subnet_ids` - a complex nested dictionary of subnet IDs denominated by matched tag values
+- `vpcs` - a dictionary of VPCs with resource ID as keys and ductionary of useful information as values
+- `vpc_ids` - a complex nested dictionary of VPC IDs denominated by matched tag values
 
 
 # AWS Resources
