@@ -274,12 +274,13 @@ $ ansible-playbook launch.yml -e env=stage -e project=manhattan -e service=app
     - role: common
 ```
 
+# Also Note
 
-# Regions
+## Regions
 
 For maximum control, this plugin requires that regions be explicitly configured. The configuration setting `regions` is a list. All regions configured will be searched for resources, and the resulting dictionaries are nested by region.
 
-# Resource Caching
+## Resource Caching
 
 Just like Ansible's EC2 inventory script, this plugin caches all the resource information it finds, in order to speed up subsequent playbook executions. The cache can be disabled by setting `use_cache: no` in the configuration file, and the cache timeout (which defaults to 10 minutes) can be specified [in seconds] with the `cache_max_age` setting.
 
