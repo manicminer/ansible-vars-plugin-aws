@@ -1,21 +1,20 @@
 ---
 
-# List of regions in which to look for VPCs, subnets and security groups
+# List of regions in which to look for AWS resources
 regions:
   - us-east-1
 
-# Whether or not to cache VPC, subnet, security group and LB tgarget group information
+# Whether or not to cache VPC, subnet, security group and LB target group information
 use_cache: yes
 
 # Maximum time in seconds to cache VPC, subnet and security group information (default: 600)
 #cache_max_age: 600
 
 # Environment variables to use when saving cache. If any of these variables change, the cache is invalidated.
-# Useful when using multiple AWS configurations or profiles.
+# Useful when using multiple AWS configurations or profiles outside of Ansible.
 cache_env_vars:
   - AWS_CONFIG_FILE
   - AWS_PROFILE
-  - AWS_STS_PROFILE
 
 # AWS profile matching
 # When a list, use for looking up resource IDs
@@ -30,12 +29,12 @@ aws_profiles:
   ops:
     env: ops
 
-# Use tags to build a hierarchical dictionary of VPCs
+# Use tags to build a hierarchical dictionary of VPC IDs
 vpc_tags:
   - project
   - env
 
-# Use tags to build a hierarchical dictionary of subnets
+# Use tags to build a hierarchical dictionary of subnet IDs
 subnet_tags:
   - project
   - env
@@ -47,7 +46,7 @@ security_group_tags:
   - env
   - service
 
-# Use tags to build a hierarchical dictionary of ELB target groups
+# Use tags to build a hierarchical dictionary of ELB target group ARNs
 elb_target_group_tags:
   - project
   - env
