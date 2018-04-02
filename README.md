@@ -37,16 +37,16 @@ A list of environment variables to inspect and save the values of when caching r
 Can be either a list of profile names, or a dictionary having profile names as keys, and each value being a dictionary of extra variables to inspect when selecting a default account for the current playbook (see below). When a list, no matching is performed and no credentials are set.
 
 `vpc_tags:`  
-A list of tag keys to match when building a dictionary of VPC IDs. When specified, the global host variable `vpc_ids` contains a nested dictionary of resource IDs denominated by tag values. If not specified, no dictonary is set.
+A list of tag keys to match when building a dictionary of VPC IDs. When specified, the global host variable `vpc_ids` contains a nested dictionary of resource IDs denominated by tag values. If not specified, no dictionary is set.
 
 `subnet_tags:`  
-A list of tag keys to match when building a dictionary of subnet IDs. When specified, the global host variable `subnet_ids` contains a nested dictionary of resource IDs denominated by tag values. If not specified, no dictonary is set.
+A list of tag keys to match when building a dictionary of subnet IDs. When specified, the global host variable `subnet_ids` contains a nested dictionary of resource IDs denominated by tag values. If not specified, no dictionary is set.
 
 `security_group_tags:`  
-A list of tag keys to match when building a dictionary of security group IDs. When specified, the global host variable `security_group_ids` contains a nested dictionary of resource IDs denominated by tag values. If not specified, no dictonary is set.
+A list of tag keys to match when building a dictionary of security group IDs. When specified, the global host variable `security_group_ids` contains a nested dictionary of resource IDs denominated by tag values. If not specified, no dictionary is set.
 
 `elb_target_group_tags:`  
-A list of tag keys to match when building a dictionary of ELB target groups IDs. When specified, the global host variable `elb_target_group_arns` contains a nested dictionary of resource IDs denominated by tag values. If not specified, no dictonary is set.
+A list of tag keys to match when building a dictionary of ELB target groups IDs. When specified, the global host variable `elb_target_group_arns` contains a nested dictionary of resource IDs denominated by tag values. If not specified, no dictionary is set.
 
 
 # Global Variables
@@ -57,11 +57,11 @@ The following host variables are set by this plugin for every host Ansible attem
 - `aws_profile` - the currently selected AWS profile when matched by extra vars
 - `elb_target_groups` - a dictionary of ELB target groups with resource ID as keys and dictionary of useful information as values
 - `elb_target_group_arns` - a complex nested dictionary of ELB target group ARNs denominated by matched tag values
-- `security_groups` - a dictionary of security groups with resource ID as keys and ductionary of useful information as values
+- `security_groups` - a dictionary of security groups with resource ID as keys and dictionary of useful information as values
 - `security_group_ids` - a complex nested dictionary of security group IDs denominated by matched tag values
-- `subnets` - a dictionary of subnets with resource ID as keys and ductionary of useful information as values
+- `subnets` - a dictionary of subnets with resource ID as keys and dictionary of useful information as values
 - `subnet_ids` - a complex nested dictionary of subnet IDs denominated by matched tag values
-- `vpcs` - a dictionary of VPCs with resource ID as keys and ductionary of useful information as values
+- `vpcs` - a dictionary of VPCs with resource ID as keys and dictionary of useful information as values
 - `vpc_ids` - a complex nested dictionary of VPC IDs denominated by matched tag values
 
 
