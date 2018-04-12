@@ -30,14 +30,17 @@ from ansible.plugins.vars import BaseVarsPlugin
 
 DIR = os.path.dirname(os.path.realpath(__file__))
 
-def get_extra_vars():
+def parse_cli_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-e', '--extra-vars', action='append')
+    parser.add_argument('--flush-cache', action='store_true', default=False)
     opts, unknown = parser.parse_known_args()
+    args = dict()
     if opts.extra_vars:
-        return dict(e.split('=') for e in opts.extra_vars)
-    else:
-        return dict()
+        args['extra_vars'] = dict(e.split('=') for e in opts.extra_vars if '=' in e)
+    if opts.flush_cache:
+        args['flush_cache'] = True
+    return args
 
 
 def load_config():
@@ -74,14 +77,16 @@ class VarsModule(BaseVarsPlugin):
         super(VarsModule, self).__init__(*args)
 
         self.config = load_config()
-        self.extra_vars = get_extra_vars()
+        cli_args = parse_cli_args()
+        self.extra_vars = cli_args.get('extra_vars', dict())
+        self.flush_cache = cli_args.get('flush_cache', False)
 
         self.cache_path = os.path.expanduser('~/.ansible/tmp/aws-vars.cache')
         self.env_cache_path = os.path.expanduser('~/.ansible/tmp/aws-vars.env')
         self.use_cache = self.config.get('use_cache', True) in [True, 'yes', 'y', 'true']
         self.cache_env_vars = self.config.get('cache_env_vars', [])
         self._connect_profiles()
-        self._export_matching_profile()
+        self._export_credentials()
 
 
     def _connect_profiles(self):
@@ -89,10 +94,23 @@ class VarsModule(BaseVarsPlugin):
             self._init_session(profile)
 
 
-    def _export_matching_profile(self):
+    def _export_credentials(self):
         self.aws_profile = None
         profiles = self.config.get('aws_profiles', None)
-        if isinstance(profiles, dict) and self.extra_vars:
+
+        if isinstance(profiles, dict):
+            profiles_list = profiles.keys()
+        else:
+            profiles_list = profiles
+
+        credentials = {profile: self._credentials(profile) for profile in profiles_list}
+
+        profile_override = os.environ.get('ANSIBLE_AWS_PROFILE')
+        default_profile = None
+        if profile_override:
+            if profile_override in profiles:
+                default_profile = profile_override
+        elif isinstance(profiles, dict) and self.extra_vars:
             for profile, rules in profiles.iteritems():
                 if isinstance(rules, dict):
                     rule_matches = {var: False for var in rules.keys()}
@@ -102,13 +120,23 @@ class VarsModule(BaseVarsPlugin):
                         if var in self.extra_vars and self.extra_vars[var] in vals:
                             rule_matches[var] = True
                     if all(m == True for m in rule_matches.values()):
-                        creds = self._credentials(profile)
-                        self.aws_profile = profile
-                        os.environ['AWS_ACCESS_KEY_ID'] = creds.access_key
-                        os.environ['AWS_SECRET_ACCESS_KEY'] = creds.secret_key
-                        os.environ['AWS_SECURITY_TOKEN'] = creds.token
-                        os.environ['AWS_SESSION_TOKEN'] = creds.token
-                        return
+                        default_profile = profile
+                        break
+
+        if default_profile:
+            self.aws_profile = default_profile
+            os.environ['AWS_ACCESS_KEY_ID'] = credentials[default_profile].access_key
+            os.environ['AWS_SECRET_ACCESS_KEY'] = credentials[default_profile].secret_key
+            os.environ['AWS_SECURITY_TOKEN'] = credentials[default_profile].token
+            os.environ['AWS_SESSION_TOKEN'] = credentials[default_profile].token
+
+        cleaner = re.compile('[^a-zA-Z0-9_]')
+        for profile, creds in credentials.iteritems():
+            profile_clean = cleaner.sub('_', profile).upper()
+            os.environ['{}_AWS_ACCESS_KEY_ID'.format(profile_clean)] = creds.access_key
+            os.environ['{}_AWS_SECRET_ACCESS_KEY'.format(profile_clean)] = creds.secret_key
+            os.environ['{}_AWS_SECURITY_TOKEN'.format(profile_clean)] = creds.token
+            os.environ['{}_AWS_SESSION_TOKEN'.format(profile_clean)] = creds.token
 
 
     def _init_session(self, profile):
@@ -272,7 +300,6 @@ class VarsModule(BaseVarsPlugin):
 
         return dict(
             aws_account_ids=self.account_ids,
-            aws_profile=self.aws_profile,
             elb_target_groups=self.elb_target_groups,
             elb_target_group_arns=self.elb_target_group_arns,
             security_groups=self.security_groups,
@@ -308,7 +335,7 @@ class VarsModule(BaseVarsPlugin):
     def _is_cache_valid(self):
         ''' Determines if the cache files have expired, or if it is still valid '''
 
-        if self.use_cache:
+        if self.use_cache and not self.flush_cache:
             if os.path.isfile(self.cache_path):
                 mod_time = os.path.getmtime(self.cache_path)
                 current_time = time.time()
@@ -346,11 +373,13 @@ class VarsModule(BaseVarsPlugin):
         super(VarsModule, self).get_vars(loader, path, entities)
 
         if self._is_cache_valid():
-            return self._get_vars_from_cache()
+            data = self._get_vars_from_cache()
         else:
             data = self._get_vars_from_api()
             self._save_cache(data)
-            return data
+
+        data['aws_profile'] = self.aws_profile
+        return data
 
 
 # vim: set ft=python ts=4 sts=4 sw=4 et:
