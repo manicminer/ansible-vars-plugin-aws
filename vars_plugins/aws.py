@@ -96,7 +96,7 @@ class VarsModule(BaseVarsPlugin):
 
     def _export_credentials(self):
         self.aws_profile = None
-        profiles = self.config.get('aws_profiles', None)
+        profiles = self.config.get('aws_profiles', ['default'])
 
         if isinstance(profiles, dict):
             profiles_list = profiles.keys()
@@ -142,7 +142,13 @@ class VarsModule(BaseVarsPlugin):
     def _init_session(self, profile):
         if not hasattr(self, 'sessions'):
             self.sessions = dict()
-        self.sessions[profile] = boto3.Session(profile_name=profile)
+        try:
+            self.sessions[profile] = boto3.Session(profile_name=profile)
+        except botocore.exceptions.ProfileNotFound as e:
+            if profile == 'default':
+                self.sessions[profile] = boto3.Session()
+            else:
+                raise
 
 
     def _session(self, profile):
